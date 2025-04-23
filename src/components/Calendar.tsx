@@ -15,11 +15,11 @@ export const Calendar = () => {
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
   return (
-    <div className="terminal-container">
+    <div className="terminal-container h-full">
       <div className="terminal-header">
         $ cal {format(currentDate, 'MMMM yyyy')}
       </div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-2">
         <button onClick={prevMonth} className="text-primary hover:text-muted-foreground">
           {'<'}
         </button>
@@ -28,9 +28,9 @@ export const Calendar = () => {
           {'>'}
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center mb-2">
+      <div className="grid grid-cols-7 gap-1 text-center mb-1">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-          <div key={day} className="text-muted-foreground text-sm">
+          <div key={day} className="text-xs text-muted-foreground">
             {day}
           </div>
         ))}
@@ -40,7 +40,7 @@ export const Calendar = () => {
           <button
             key={day.toString()}
             onClick={() => setSelectedDate(day)}
-            className={`p-1 hover:bg-accent ${
+            className={`p-0.5 text-sm hover:bg-accent ${
               isSameDay(day, selectedDate) ? 'bg-primary text-primary-foreground' : ''
             }`}
           >

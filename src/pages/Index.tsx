@@ -9,14 +9,25 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Calendar />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Primera columna */}
           <div className="space-y-4">
+            <div className="h-60">
+              <Calendar />
+            </div>
             <Notes />
-            <TodoList />
-            <LinkManager />
           </div>
-          <div className="md:col-span-2">
+          
+          {/* Segunda columna */}
+          <div>
+            <TodoList />
+          </div>
+          
+          {/* Tercera columna */}
+          <div className="space-y-4">
+            <div className="h-80">
+              <LinkManager />
+            </div>
             <TimeProgress />
           </div>
         </div>
