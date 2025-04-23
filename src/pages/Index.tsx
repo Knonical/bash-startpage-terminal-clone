@@ -3,6 +3,7 @@ import { Calendar } from '@/components/Calendar';
 import { Notes } from '@/components/Notes';
 import { TodoList } from '@/components/TodoList';
 import { TimeProgress } from '@/components/TimeProgress';
+import { LinkManager } from '@/components/LinkManager';
 
 const Index = () => {
   return (
@@ -13,6 +14,7 @@ const Index = () => {
           <div className="space-y-4">
             <Notes />
             <TodoList />
+            <LinkManager />
           </div>
           <div className="md:col-span-2">
             <TimeProgress />
