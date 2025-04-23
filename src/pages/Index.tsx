@@ -12,7 +12,7 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Primera columna */}
           <div className="space-y-4">
-            <div className="h-60">
+            <div className="h-48">
               <Calendar />
             </div>
             <Notes />
@@ -24,8 +24,8 @@ const Index = () => {
           </div>
           
           {/* Tercera columna */}
-          <div className="space-y-4">
-            <div className="h-80">
+          <div className="md:col-span-3">
+            <div className="h-auto">
               <LinkManager />
             </div>
             <TimeProgress />
