@@ -15,15 +15,19 @@ const Index = () => {
             <div className="h-48">
               <Calendar />
             </div>
-            <Notes />
           </div>
           
           {/* Segunda columna */}
-          <div>
+          <div className="space-y-4">
             <TodoList />
           </div>
           
           {/* Tercera columna */}
+          <div className="space-y-4">
+            <Notes />
+          </div>
+          
+          {/* Cuarta columna - LinkManager */}
           <div className="md:col-span-3">
             <div className="h-auto">
               <LinkManager />
