@@ -53,11 +53,13 @@ export const TimeProgress = () => {
     <div className="terminal-container">
       <div className="terminal-header">$ progress</div>
       <div className="space-y-4">
-        <div className="text-2xl font-mono mb-4">{currentTime}</div>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Day</span>
-            <span>{progress.day.toFixed(1)}%</span>
+            <div className="flex items-center space-x-2">
+              <span>{progress.day.toFixed(1)}%</span>
+              <span className="text-sm">{currentTime}</span>
+            </div>
           </div>
           <div className="progress-bar">
             <div className="progress-value" style={{ width: `${progress.day}%` }} />
@@ -67,7 +69,10 @@ export const TimeProgress = () => {
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Week</span>
-            <span>{progress.week.toFixed(1)}%</span>
+            <div className="flex items-center space-x-2">
+              <span>{progress.week.toFixed(1)}%</span>
+              <span className="text-sm">{currentTime}</span>
+            </div>
           </div>
           <div className="progress-bar">
             <div className="progress-value" style={{ width: `${progress.week}%` }} />
@@ -77,7 +82,10 @@ export const TimeProgress = () => {
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Month</span>
-            <span>{progress.month.toFixed(1)}%</span>
+            <div className="flex items-center space-x-2">
+              <span>{progress.month.toFixed(1)}%</span>
+              <span className="text-sm">{currentTime}</span>
+            </div>
           </div>
           <div className="progress-bar">
             <div className="progress-value" style={{ width: `${progress.month}%` }} />
@@ -87,7 +95,10 @@ export const TimeProgress = () => {
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Year</span>
-            <span>{progress.year.toFixed(1)}%</span>
+            <div className="flex items-center space-x-2">
+              <span>{progress.year.toFixed(1)}%</span>
+              <span className="text-sm">{currentTime}</span>
+            </div>
           </div>
           <div className="progress-bar">
             <div className="progress-value" style={{ width: `${progress.year}%` }} />
@@ -97,3 +108,4 @@ export const TimeProgress = () => {
     </div>
   );
 };
+
