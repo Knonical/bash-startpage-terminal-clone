@@ -1,35 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Link as LinkIcon, Bookmark, Globe, Heart, Star, ExternalLink, ChevronDown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-
-interface LinkGroup {
-  name: string;
-  links: Link[];
-}
-
-interface Link {
-  title: string;
-  url: string;
-  icon: string;
-}
-
-const ICONS = {
-  bookmark: Bookmark,
-  globe: Globe,
-  heart: Heart,
-  star: Star,
-  link: LinkIcon,
-  external: ExternalLink
-};
+import { Dialog } from '@/components/ui/dialog';
+import { LinkGroup } from '@/types/link';
+import { AddGroupDialog } from './link-manager/AddGroupDialog';
+import { AddLinkDialog } from './link-manager/AddLinkDialog';
+import { LinkGroups } from './link-manager/LinkGroups';
 
 export const LinkManager = () => {
   const [groups, setGroups] = useState<LinkGroup[]>([]);
@@ -65,11 +41,6 @@ export const LinkManager = () => {
     }
   };
 
-  const renderIcon = (iconName: string) => {
-    const IconComponent = ICONS[iconName as keyof typeof ICONS] || LinkIcon;
-    return <IconComponent className="h-4 w-4 text-muted-foreground" />;
-  };
-
   const openAddGroupDialog = () => {
     setShowAddGroup(true);
     setShowAddLink(false);
@@ -86,34 +57,7 @@ export const LinkManager = () => {
     <div className="terminal-container h-full">
       <div className="terminal-header">$ cat bookmarks.txt</div>
       <div className="min-h-[150px] mb-4">
-        {groups.length === 0 ? (
-          <div className="text-muted-foreground">No bookmarks yet. Add a group to get started!</div>
-        ) : (
-          <Accordion type="multiple" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {groups.map((group) => (
-              <AccordionItem key={group.name} value={group.name} className="border rounded-lg p-2">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="text-primary">/{group.name}</div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  {group.links.map((link, index) => (
-                    <div key={index} className="flex items-center gap-2 mb-1 ml-4">
-                      {renderIcon(link.icon)}
-                      <a 
-                        href={link.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-foreground hover:underline"
-                      >
-                        {link.title}
-                      </a>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        )}
+        <LinkGroups groups={groups} />
       </div>
       
       <div className="flex gap-2">
@@ -126,78 +70,22 @@ export const LinkManager = () => {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{showAddGroup ? "Add New Group" : "Add New Link"}</DialogTitle>
-          </DialogHeader>
-          
-          {showAddGroup && (
-            <div className="space-y-2">
-              <Input
-                type="text"
-                value={newGroup}
-                onChange={(e) => setNewGroup(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addGroup()}
-                placeholder="Enter group name..."
-                className="flex-1"
-                autoFocus
-              />
-              <Button onClick={addGroup} variant="outline" className="w-full">
-                Add Group
-              </Button>
-            </div>
-          )}
-
-          {showAddLink && (
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  value={newLink.title}
-                  onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
-                  placeholder="Enter link title..."
-                  className="flex-1"
-                  autoFocus
-                />
-                <select
-                  value={newLink.icon}
-                  onChange={(e) => setNewLink({ ...newLink, icon: e.target.value })}
-                  className="w-24 bg-background border border-border p-2 text-foreground"
-                >
-                  {Object.keys(ICONS).map((icon) => (
-                    <option key={icon} value={icon}>
-                      {icon}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <Input
-                type="text"
-                value={newLink.url}
-                onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
-                placeholder="Enter URL (https://...)..."
-              />
-              <div className="flex gap-2">
-                <select
-                  value={newLink.group}
-                  onChange={(e) => setNewLink({ ...newLink, group: e.target.value })}
-                  className="flex-1 bg-background border border-border p-2 text-foreground"
-                >
-                  <option value="">Select group...</option>
-                  {groups.map((group) => (
-                    <option key={group.name} value={group.name}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <Button onClick={addLink} variant="outline" className="w-full">
-                Add Link
-              </Button>
-            </div>
-          )}
-        </DialogContent>
+        {showAddGroup ? (
+          <AddGroupDialog
+            newGroup={newGroup}
+            setNewGroup={setNewGroup}
+            onAddGroup={addGroup}
+          />
+        ) : (
+          <AddLinkDialog
+            groups={groups}
+            newLink={newLink}
+            setNewLink={setNewLink}
+            onAddLink={addLink}
+          />
+        )}
       </Dialog>
     </div>
   );
 };
+
