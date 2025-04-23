@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Link as LinkIcon, Bookmark, Globe, Heart, Star, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface LinkGroup {
   name: string;
@@ -30,6 +31,7 @@ export const LinkManager = () => {
   const [newLink, setNewLink] = useState({ title: '', url: '', group: '', icon: 'link' });
   const [showAddLink, setShowAddLink] = useState(false);
   const [showAddGroup, setShowAddGroup] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const addGroup = () => {
     if (newGroup.trim()) {
@@ -37,6 +39,7 @@ export const LinkManager = () => {
       setNewGroup('');
       setShowAddLink(true);
       setShowAddGroup(false);
+      setDialogOpen(false);
     }
   };
 
@@ -52,12 +55,25 @@ export const LinkManager = () => {
         return group;
       }));
       setNewLink({ ...newLink, title: '', url: '' });
+      setDialogOpen(false);
     }
   };
 
   const renderIcon = (iconName: string) => {
     const IconComponent = ICONS[iconName as keyof typeof ICONS] || LinkIcon;
     return <IconComponent className="h-4 w-4 text-muted-foreground" />;
+  };
+
+  const openAddGroupDialog = () => {
+    setShowAddGroup(true);
+    setShowAddLink(false);
+    setDialogOpen(true);
+  };
+
+  const openAddLinkDialog = () => {
+    setShowAddGroup(false);
+    setShowAddLink(true);
+    setDialogOpen(true);
   };
 
   return (
@@ -88,74 +104,88 @@ export const LinkManager = () => {
         )}
       </div>
       
-      {showAddGroup && (
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            value={newGroup}
-            onChange={(e) => setNewGroup(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addGroup()}
-            placeholder="Enter group name..."
-            className="flex-1"
-          />
-          <Button onClick={addGroup} variant="outline" size="icon">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
+      <div className="flex gap-2">
+        <Button onClick={openAddGroupDialog} variant="outline" className="flex-1">
+          Add Group
+        </Button>
+        <Button onClick={openAddLinkDialog} variant="outline" className="flex-1" disabled={groups.length === 0}>
+          Add Link
+        </Button>
+      </div>
 
-      {showAddLink && (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              value={newLink.title}
-              onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
-              placeholder="Enter link title..."
-              className="flex-1"
-            />
-            <select
-              value={newLink.icon}
-              onChange={(e) => setNewLink({ ...newLink, icon: e.target.value })}
-              className="w-24 bg-background border border-border p-2 text-foreground"
-            >
-              {Object.keys(ICONS).map((icon) => (
-                <option key={icon} value={icon}>
-                  {icon}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Input
-            type="text"
-            value={newLink.url}
-            onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
-            placeholder="Enter URL (https://...)..."
-          />
-          <div className="flex gap-2">
-            <select
-              value={newLink.group}
-              onChange={(e) => setNewLink({ ...newLink, group: e.target.value })}
-              className="flex-1 bg-background border border-border p-2 text-foreground"
-            >
-              <option value="">Select group...</option>
-              {groups.map((group) => (
-                <option key={group.name} value={group.name}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={addLink} variant="outline" className="flex-1">
-              Add Link
-            </Button>
-            <Button onClick={() => {setShowAddGroup(true); setShowAddLink(false);}} variant="outline">
-              Add Group
-            </Button>
-          </div>
-        </div>
-      )}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{showAddGroup ? "Add New Group" : "Add New Link"}</DialogTitle>
+          </DialogHeader>
+          
+          {showAddGroup && (
+            <div className="space-y-2">
+              <Input
+                type="text"
+                value={newGroup}
+                onChange={(e) => setNewGroup(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addGroup()}
+                placeholder="Enter group name..."
+                className="flex-1"
+                autoFocus
+              />
+              <Button onClick={addGroup} variant="outline" className="w-full">
+                Add Group
+              </Button>
+            </div>
+          )}
+
+          {showAddLink && (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  value={newLink.title}
+                  onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
+                  placeholder="Enter link title..."
+                  className="flex-1"
+                  autoFocus
+                />
+                <select
+                  value={newLink.icon}
+                  onChange={(e) => setNewLink({ ...newLink, icon: e.target.value })}
+                  className="w-24 bg-background border border-border p-2 text-foreground"
+                >
+                  {Object.keys(ICONS).map((icon) => (
+                    <option key={icon} value={icon}>
+                      {icon}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Input
+                type="text"
+                value={newLink.url}
+                onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
+                placeholder="Enter URL (https://...)..."
+              />
+              <div className="flex gap-2">
+                <select
+                  value={newLink.group}
+                  onChange={(e) => setNewLink({ ...newLink, group: e.target.value })}
+                  className="flex-1 bg-background border border-border p-2 text-foreground"
+                >
+                  <option value="">Select group...</option>
+                  {groups.map((group) => (
+                    <option key={group.name} value={group.name}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button onClick={addLink} variant="outline" className="w-full">
+                Add Link
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
