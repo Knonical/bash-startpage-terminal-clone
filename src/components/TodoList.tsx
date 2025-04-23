@@ -27,9 +27,9 @@ export const TodoList = () => {
   };
 
   return (
-    <div className="terminal-container">
+    <div className="terminal-container h-full flex flex-col">
       <div className="terminal-header">$ cat todo.txt</div>
-      <div className="min-h-[100px] mb-4">
+      <div className="flex-1 mb-4 overflow-y-auto">
         {todos.length === 0 ? (
           <div className="text-muted-foreground">No tasks yet. Add one to get started!</div>
         ) : (

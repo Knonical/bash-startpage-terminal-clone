@@ -38,7 +38,7 @@ export const Calendar = () => {
   };
 
   return (
-    <div className="terminal-container h-full">
+    <div className="terminal-container h-full flex flex-col">
       <div className="terminal-header">
         $ cal {format(currentDate, 'MMMM yyyy')}
       </div>
@@ -58,7 +58,7 @@ export const Calendar = () => {
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center">
+      <div className="grid grid-cols-7 gap-1 text-center flex-1">
         {days.map(day => {
           const reminder = getReminderForDate(day);
           return (

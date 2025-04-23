@@ -15,9 +15,9 @@ export const Notes = () => {
   };
 
   return (
-    <div className="terminal-container">
+    <div className="terminal-container h-full flex flex-col">
       <div className="terminal-header">$ cat notes.txt</div>
-      <div className="min-h-[100px] mb-4">
+      <div className="flex-1 mb-4 overflow-y-auto">
         {notes.length === 0 ? (
           <div className="text-muted-foreground">No notes yet. Add one to get started!</div>
         ) : (
