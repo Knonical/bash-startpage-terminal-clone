@@ -1,10 +1,15 @@
 
 import React from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { Reminder } from '@/types/reminder';
+import { ReminderDialog } from './ReminderDialog';
+import { toast } from '@/components/ui/sonner';
 
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = React.useState(new Date());
   const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [reminders, setReminders] = React.useState<Reminder[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const days = eachDayOfInterval({
     start: startOfMonth(currentDate),
@@ -13,6 +18,24 @@ export const Calendar = () => {
 
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+
+  const handleDayClick = (day: Date) => {
+    setSelectedDate(day);
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveReminder = (reminderData: Omit<Reminder, 'id'>) => {
+    const newReminder: Reminder = {
+      ...reminderData,
+      id: crypto.randomUUID()
+    };
+    setReminders([...reminders, newReminder]);
+    toast.success('Reminder added successfully');
+  };
+
+  const getReminderForDate = (date: Date) => {
+    return reminders.find(reminder => isSameDay(new Date(reminder.date), date));
+  };
 
   return (
     <div className="terminal-container h-full">
@@ -36,18 +59,33 @@ export const Calendar = () => {
         ))}
       </div>
       <div className="grid grid-cols-7 gap-1 text-center">
-        {days.map(day => (
-          <button
-            key={day.toString()}
-            onClick={() => setSelectedDate(day)}
-            className={`p-0.5 text-sm hover:bg-accent ${
-              isSameDay(day, selectedDate) ? 'bg-primary text-primary-foreground' : ''
-            }`}
-          >
-            {format(day, 'd')}
-          </button>
-        ))}
+        {days.map(day => {
+          const reminder = getReminderForDate(day);
+          return (
+            <button
+              key={day.toString()}
+              onClick={() => handleDayClick(day)}
+              className={`p-0.5 text-sm hover:bg-accent relative ${
+                isSameDay(day, selectedDate) ? 'bg-primary text-primary-foreground' : ''
+              }`}
+              style={reminder ? { backgroundColor: reminder.color } : undefined}
+              title={reminder?.title}
+            >
+              {format(day, 'd')}
+              {reminder && (
+                <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      <ReminderDialog
+        date={selectedDate}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSave={handleSaveReminder}
+      />
     </div>
   );
 };
