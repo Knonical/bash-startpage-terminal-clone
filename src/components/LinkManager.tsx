@@ -1,9 +1,15 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Link as LinkIcon, Bookmark, Globe, Heart, Star, ExternalLink } from 'lucide-react';
+import { Plus, Link as LinkIcon, Bookmark, Globe, Heart, Star, ExternalLink, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 interface LinkGroup {
   name: string;
@@ -83,24 +89,30 @@ export const LinkManager = () => {
         {groups.length === 0 ? (
           <div className="text-muted-foreground">No bookmarks yet. Add a group to get started!</div>
         ) : (
-          groups.map((group) => (
-            <div key={group.name} className="mb-4">
-              <div className="text-primary mb-2">/{group.name}</div>
-              {group.links.map((link, index) => (
-                <div key={index} className="flex items-center gap-2 mb-1 ml-4">
-                  {renderIcon(link.icon)}
-                  <a 
-                    href={link.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-foreground hover:underline"
-                  >
-                    {link.title}
-                  </a>
-                </div>
-              ))}
-            </div>
-          ))
+          <Accordion type="multiple" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {groups.map((group) => (
+              <AccordionItem key={group.name} value={group.name} className="border rounded-lg p-2">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="text-primary">/{group.name}</div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  {group.links.map((link, index) => (
+                    <div key={index} className="flex items-center gap-2 mb-1 ml-4">
+                      {renderIcon(link.icon)}
+                      <a 
+                        href={link.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-foreground hover:underline"
+                      >
+                        {link.title}
+                      </a>
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         )}
       </div>
       
