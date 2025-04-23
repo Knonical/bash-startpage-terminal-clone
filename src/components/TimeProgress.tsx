@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { Progress } from '@/components/ui/progress';
 
 export const TimeProgress = () => {
   const [progress, setProgress] = useState({
@@ -24,9 +25,9 @@ export const TimeProgress = () => {
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       const monthProgress = (now.getDate() / daysInMonth) * 100;
       
-      // Year progress
+      // Year progress - Fix for the TypeScript error
       const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const yearProgress = ((now - startOfYear) / (1000 * 60 * 60 * 24 * 365)) * 100;
+      const yearProgress = ((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24 * 365)) * 100;
       
       setProgress({
         day: dayProgress,
