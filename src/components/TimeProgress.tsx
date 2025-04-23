@@ -9,10 +9,17 @@ export const TimeProgress = () => {
     month: 0,
     year: 0
   });
+  const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {
     const calculateProgress = () => {
       const now = new Date();
+      
+      // Format digital time (24h format)
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      setCurrentTime(`${hours}:${minutes}:${seconds}`);
       
       // Day progress
       const dayProgress = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) / 864;
@@ -25,7 +32,7 @@ export const TimeProgress = () => {
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       const monthProgress = (now.getDate() / daysInMonth) * 100;
       
-      // Year progress - Fix for the TypeScript error
+      // Year progress
       const startOfYear = new Date(now.getFullYear(), 0, 1);
       const yearProgress = ((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24 * 365)) * 100;
       
@@ -46,6 +53,7 @@ export const TimeProgress = () => {
     <div className="terminal-container">
       <div className="terminal-header">$ progress</div>
       <div className="space-y-4">
+        <div className="text-2xl font-mono mb-4">{currentTime}</div>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Day</span>
