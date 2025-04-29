@@ -9,4 +9,5 @@ export interface Link {
   title: string;
   url: string;
   icon: string;
+  group?: string; // Added group property
 }

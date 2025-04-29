@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LinkGroup } from '@/types/link';
+import { Link, LinkGroup } from '@/types/link';
 import { ICONS } from '@/constants/icons';
 import { Pencil, Trash2 } from 'lucide-react';
 import {
