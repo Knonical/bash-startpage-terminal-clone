@@ -2,18 +2,21 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
-import { LinkGroup } from '@/types/link';
+import { Link, LinkGroup } from '@/types/link';
 import { AddGroupDialog } from './link-manager/AddGroupDialog';
 import { AddLinkDialog } from './link-manager/AddLinkDialog';
 import { LinkGroups } from './link-manager/LinkGroups';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 export const LinkManager = () => {
   const [groups, setGroups] = useState<LinkGroup[]>([]);
   const [newGroup, setNewGroup] = useState('');
-  const [newLink, setNewLink] = useState({ title: '', url: '', group: '', icon: 'link' });
+  const [newLink, setNewLink] = useState<Link>({ id: '', title: '', url: '', group: '', icon: 'link' });
   const [showAddLink, setShowAddLink] = useState(false);
   const [showAddGroup, setShowAddGroup] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const addGroup = () => {
     if (newGroup.trim()) {
@@ -22,23 +25,66 @@ export const LinkManager = () => {
       setShowAddLink(true);
       setShowAddGroup(false);
       setDialogOpen(false);
+      toast.success(`Grupo "${newGroup}" añadido con éxito`);
     }
   };
 
   const addLink = () => {
     if (newLink.title && newLink.url && newLink.group) {
-      setGroups(groups.map(group => {
-        if (group.name === newLink.group) {
-          return {
-            ...group,
-            links: [...group.links, { title: newLink.title, url: newLink.url, icon: newLink.icon }]
-          };
-        }
-        return group;
-      }));
-      setNewLink({ ...newLink, title: '', url: '' });
+      if (isEditing) {
+        // Si estamos editando, actualizamos el enlace existente
+        setGroups(groups.map(group => {
+          if (group.name === newLink.group) {
+            return {
+              ...group,
+              links: group.links.map(link => 
+                link.id === newLink.id ? newLink : link
+              )
+            };
+          }
+          return group;
+        }));
+        toast.success(`Enlace "${newLink.title}" actualizado`);
+      } else {
+        // Si estamos añadiendo, creamos un nuevo enlace con ID único
+        const linkWithId = { ...newLink, id: uuidv4() };
+        setGroups(groups.map(group => {
+          if (group.name === newLink.group) {
+            return {
+              ...group,
+              links: [...group.links, linkWithId]
+            };
+          }
+          return group;
+        }));
+        toast.success(`Enlace "${newLink.title}" añadido a "${newLink.group}"`);
+      }
+      
+      setNewLink({ id: '', title: '', url: '', group: '', icon: 'link' });
       setDialogOpen(false);
+      setIsEditing(false);
     }
+  };
+
+  const handleEditLink = (groupName: string, link: Link) => {
+    setNewLink({ ...link, group: groupName });
+    setIsEditing(true);
+    setShowAddGroup(false);
+    setShowAddLink(true);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteLink = (groupName: string, linkId: string) => {
+    setGroups(groups.map(group => {
+      if (group.name === groupName) {
+        return {
+          ...group,
+          links: group.links.filter(link => link.id !== linkId)
+        };
+      }
+      return group;
+    }));
+    toast.success("Enlace eliminado");
   };
 
   const openAddGroupDialog = () => {
@@ -50,6 +96,8 @@ export const LinkManager = () => {
   const openAddLinkDialog = () => {
     setShowAddGroup(false);
     setShowAddLink(true);
+    setIsEditing(false);
+    setNewLink({ id: '', title: '', url: '', group: '', icon: 'link' });
     setDialogOpen(true);
   };
 
@@ -57,7 +105,11 @@ export const LinkManager = () => {
     <div className="terminal-container h-full">
       <div className="terminal-header">$ cat bookmarks.txt</div>
       <div className="min-h-[150px] mb-4">
-        <LinkGroups groups={groups} />
+        <LinkGroups 
+          groups={groups} 
+          onEditLink={handleEditLink}
+          onDeleteLink={handleDeleteLink}
+        />
       </div>
       
       <div className="flex gap-2">
@@ -82,10 +134,10 @@ export const LinkManager = () => {
             newLink={newLink}
             setNewLink={setNewLink}
             onAddLink={addLink}
+            isEditing={isEditing}
           />
         )}
       </Dialog>
     </div>
   );
 };
-

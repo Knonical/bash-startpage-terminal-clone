@@ -4,23 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ICONS } from '@/constants/icons';
-import { LinkGroup } from '@/types/link';
+import { Link, LinkGroup } from '@/types/link';
 
 interface AddLinkDialogProps {
   groups: LinkGroup[];
-  newLink: {
-    title: string;
-    url: string;
-    group: string;
-    icon: string;
-  };
-  setNewLink: (link: {
-    title: string;
-    url: string;
-    group: string;
-    icon: string;
-  }) => void;
+  newLink: Link;
+  setNewLink: (link: Link) => void;
   onAddLink: () => void;
+  isEditing?: boolean;
 }
 
 export const AddLinkDialog = ({
@@ -28,11 +19,12 @@ export const AddLinkDialog = ({
   newLink,
   setNewLink,
   onAddLink,
+  isEditing = false,
 }: AddLinkDialogProps) => {
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Add New Link</DialogTitle>
+        <DialogTitle>{isEditing ? 'Edit Link' : 'Add New Link'}</DialogTitle>
       </DialogHeader>
       <div className="space-y-2">
         <div className="flex gap-2">
@@ -67,6 +59,7 @@ export const AddLinkDialog = ({
             value={newLink.group}
             onChange={(e) => setNewLink({ ...newLink, group: e.target.value })}
             className="flex-1 bg-background border border-border p-2 text-foreground"
+            disabled={isEditing}
           >
             <option value="">Select group...</option>
             {groups.map((group) => (
@@ -77,10 +70,9 @@ export const AddLinkDialog = ({
           </select>
         </div>
         <Button onClick={onAddLink} variant="outline" className="w-full">
-          Add Link
+          {isEditing ? 'Save Changes' : 'Add Link'}
         </Button>
       </div>
     </DialogContent>
   );
 };
-
