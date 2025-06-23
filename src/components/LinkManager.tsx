@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { Link, LinkGroup } from '@/types/link';
@@ -9,6 +8,8 @@ import { LinkGroups } from './link-manager/LinkGroups';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
+const STORAGE_KEY = 'bookmark-groups';
+
 export const LinkManager = () => {
   const [groups, setGroups] = useState<LinkGroup[]>([]);
   const [newGroup, setNewGroup] = useState('');
@@ -17,6 +18,26 @@ export const LinkManager = () => {
   const [showAddGroup, setShowAddGroup] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Cargar datos del localStorage al inicializar
+  useEffect(() => {
+    const savedGroups = localStorage.getItem(STORAGE_KEY);
+    if (savedGroups) {
+      try {
+        const parsedGroups = JSON.parse(savedGroups);
+        setGroups(parsedGroups);
+      } catch (error) {
+        console.error('Error loading saved groups:', error);
+      }
+    }
+  }, []);
+
+  // Guardar en localStorage cada vez que cambien los grupos
+  useEffect(() => {
+    if (groups.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+    }
+  }, [groups]);
 
   const addGroup = () => {
     if (newGroup.trim()) {
