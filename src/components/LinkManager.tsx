@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
@@ -7,6 +8,7 @@ import { AddLinkDialog } from './link-manager/AddLinkDialog';
 import { LinkGroups } from './link-manager/LinkGroups';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { Download, Upload } from 'lucide-react';
 
 const STORAGE_KEY = 'bookmark-groups';
 
@@ -122,6 +124,56 @@ export const LinkManager = () => {
     setDialogOpen(true);
   };
 
+  const exportToJSON = () => {
+    const dataToExport = {
+      version: '1.0',
+      exportDate: new Date().toISOString(),
+      groups: groups
+    };
+    
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bookmarks-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Enlaces exportados correctamente');
+  };
+
+  const importFromJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const importedData = JSON.parse(content);
+        
+        // Validar estructura básica
+        if (importedData.groups && Array.isArray(importedData.groups)) {
+          setGroups(importedData.groups);
+          toast.success('Enlaces importados correctamente');
+        } else {
+          toast.error('Formato de archivo no válido');
+        }
+      } catch (error) {
+        console.error('Error importing JSON:', error);
+        toast.error('Error al importar el archivo');
+      }
+    };
+    
+    reader.readAsText(file);
+    // Limpiar el input para permitir seleccionar el mismo archivo otra vez
+    event.target.value = '';
+  };
+
   return (
     <div className="terminal-container h-full">
       <div className="terminal-header">$ cat bookmarks.txt</div>
@@ -133,13 +185,37 @@ export const LinkManager = () => {
         />
       </div>
       
-      <div className="flex gap-2">
+      <div className="flex gap-2 mb-4">
         <Button onClick={openAddGroupDialog} variant="outline" className="flex-1">
           Add Group
         </Button>
         <Button onClick={openAddLinkDialog} variant="outline" className="flex-1" disabled={groups.length === 0}>
           Add Link
         </Button>
+      </div>
+
+      <div className="flex gap-2">
+        <Button onClick={exportToJSON} variant="outline" className="flex-1" disabled={groups.length === 0}>
+          <Download className="h-4 w-4 mr-2" />
+          Exportar JSON
+        </Button>
+        <div className="flex-1">
+          <input
+            type="file"
+            accept=".json"
+            onChange={importFromJSON}
+            style={{ display: 'none' }}
+            id="json-import"
+          />
+          <Button 
+            onClick={() => document.getElementById('json-import')?.click()}
+            variant="outline" 
+            className="w-full"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar JSON
+          </Button>
+        </div>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
