@@ -158,8 +158,50 @@ export const LinkManager = () => {
         
         // Validar estructura básica
         if (importedData.groups && Array.isArray(importedData.groups)) {
-          setGroups(importedData.groups);
-          toast.success('Enlaces importados correctamente');
+          // Combinar grupos existentes con los importados
+          const combinedGroups = [...groups];
+          
+          importedData.groups.forEach((importedGroup: LinkGroup) => {
+            const existingGroupIndex = combinedGroups.findIndex(g => g.name === importedGroup.name);
+            
+            if (existingGroupIndex >= 0) {
+              // Si el grupo ya existe, añadir solo los enlaces nuevos
+              const existingGroup = combinedGroups[existingGroupIndex];
+              const newLinks: Link[] = [];
+              
+              importedGroup.links.forEach((importedLink: Link) => {
+                // Generar nuevo ID si el enlace no lo tiene o si ya existe
+                const linkExists = existingGroup.links.some(link => 
+                  link.url === importedLink.url && link.title === importedLink.title
+                );
+                
+                if (!linkExists) {
+                  newLinks.push({
+                    ...importedLink,
+                    id: importedLink.id || uuidv4()
+                  });
+                }
+              });
+              
+              combinedGroups[existingGroupIndex] = {
+                ...existingGroup,
+                links: [...existingGroup.links, ...newLinks]
+              };
+            } else {
+              // Si el grupo no existe, añadirlo completo asegurando IDs únicos
+              const groupWithIds = {
+                ...importedGroup,
+                links: importedGroup.links.map((link: Link) => ({
+                  ...link,
+                  id: link.id || uuidv4()
+                }))
+              };
+              combinedGroups.push(groupWithIds);
+            }
+          });
+          
+          setGroups(combinedGroups);
+          toast.success('Enlaces importados y combinados correctamente');
         } else {
           toast.error('Formato de archivo no válido');
         }
